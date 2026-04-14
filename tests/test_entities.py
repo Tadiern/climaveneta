@@ -22,6 +22,13 @@ from custom_components.climaveneta.binary_sensor import (
     IMXW_BINARY_SENSOR_TYPES,
     ILIFE2_BINARY_SENSOR_TYPES,
 )
+from custom_components.climaveneta.number import (
+    ClimavenetaNumber,
+    IMXW_NUMBER_TYPES,
+    _SETTER_MAP,
+    _GETTER_MAP,
+    async_setup_entry as number_setup_entry,
+)
 from custom_components.climaveneta.const import (
     CLIMAVENETA_EXCHANGER_TEMPERATURE,
     CLIMAVENETA_HVAC_STATUS,
@@ -32,12 +39,14 @@ from custom_components.climaveneta.const import (
     CLIMAVENETA_WINDOW_INPUT,
     CLIMAVENETA_PUMP_ALARM_INPUT,
     CLIMAVENETA_HEATER_PRESENT,
-    CLIMAVENETA_ANALOG_OUTPUT,
     CLIMAVENETA_ALARM_T1,
     CLIMAVENETA_ALARM_T2,
     CLIMAVENETA_ALARM_T3,
     CLIMAVENETA_ALARM_WATER_DRAIN,
-    CLIMAVENETA_ALARM_COM,
+    CLIMAVENETA_ANTISTRAT_WAIT_TIME,
+    CLIMAVENETA_T1_COMPENSATION_BASE_SUMMER,
+    CLIMAVENETA_ANTISTRAT_TIME_SUMMER,
+    CLIMAVENETA_ANTISTRAT_TIME_WINTER,
 )
 from custom_components.climaveneta.pyclimaveneta import (
     CV_ACTION_OFF,
@@ -350,20 +359,6 @@ class TestClimavenetaBinarySensor:
 
 # ────────────────────────── Number entity tests ──────────────────────────
 
-from custom_components.climaveneta.number import (
-    ClimavenetaNumber,
-    IMXW_NUMBER_TYPES,
-    _SETTER_MAP,
-    _GETTER_MAP,
-)
-from custom_components.climaveneta.const import (
-    CLIMAVENETA_ANTISTRAT_WAIT_TIME,
-    CLIMAVENETA_T1_COMPENSATION_BASE_SUMMER,
-    CLIMAVENETA_ANTISTRAT_TIME_SUMMER,
-    CLIMAVENETA_T1_COMPENSATION_BASE_WINTER,
-    CLIMAVENETA_ANTISTRAT_TIME_WINTER,
-)
-
 
 class TestNumberTypeDefinitions:
     """Verify number entity type tuples are correct."""
@@ -492,8 +487,6 @@ class TestClimavenetaNumber:
 
 
 # ────────────────────────── Number platform setup ──────────────────────────
-
-from custom_components.climaveneta.number import async_setup_entry as number_setup_entry
 
 
 class TestNumberSetup:

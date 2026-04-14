@@ -1,7 +1,7 @@
 """Tests for coordinator _async_update_data and entity classes."""
 
 import pytest
-from unittest.mock import MagicMock, AsyncMock, patch, PropertyMock
+from unittest.mock import MagicMock, AsyncMock
 
 from custom_components.climaveneta.coordinator import ClimavenetaCoordinator
 from custom_components.climaveneta.const import (
@@ -25,22 +25,12 @@ from custom_components.climaveneta.const import (
     CLIMAVENETA_MOTOR_SPEED_SET,
     CLIMAVENETA_ALARM_COM,
     CLIMAVENETA_ALARM_AIR,
-    CLIMAVENETA_ALARM_H4,
-    CLIMAVENETA_ALARM_ACQ_DAN,
-    CLIMAVENETA_ALARM_H2,
-    CLIMAVENETA_ALARM_H4_NID,
-    CLIMAVENETA_ALARM_HI_RES,
-    CLIMAVENETA_ALARM_MOT,
-    CLIMAVENETA_ALARM_GRID,
-    CLIMAVENETA_ALARM_H2_NID,
     CLIMAVENETA_ALARM_FILTRO,
     CLIMAVENETA_ALARM_2AIR_M5,
     CLIMAVENETA_SETPOINT_HYSTERESIS,
-    CLIMAVENETA_ANTISTRAT_WAIT_TIME,
     CLIMAVENETA_MODBUS_ADDRESS,
     CLIMAVENETA_T2_TEMPERATURE,
     CLIMAVENETA_OFFSET_NTC_ETN,
-    DOMAIN,
 )
 
 

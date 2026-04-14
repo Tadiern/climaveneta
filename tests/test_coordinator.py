@@ -1,6 +1,5 @@
-import asyncio
 import pytest
-from unittest.mock import MagicMock, AsyncMock, patch
+from unittest.mock import MagicMock, AsyncMock
 
 from custom_components.climaveneta.coordinator import ClimavenetaCoordinator
 

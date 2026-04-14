@@ -1,7 +1,6 @@
 """Extended tests for pyclimaveneta — covers getters, HVAC logic, setters, modbus I/O."""
 
 import asyncio
-import time
 import pytest
 from unittest.mock import MagicMock, AsyncMock, patch
 
@@ -33,12 +32,6 @@ from custom_components.climaveneta.pyclimaveneta import (
     CV_PRESET_MODE_NONE,
     CV_PRESET_MODE_ECO,
     CV_PRESET_MODE_AWAY,
-    CV_IMXW_MODE_SUMMER,
-    CV_IMXW_MODE_WINTER,
-    CV_IMXW_MODE_FAN_ONLY,
-    CV_IMXW_MODE_AUTO,
-    CLIMAVENETA_IMXW,
-    CLIMAVENETA_ILIFE2,
 )
 
 
@@ -775,7 +768,6 @@ class TestHexToCustomString:
     """Additional edge cases for version string conversion."""
 
     def test_short_hex(self):
-        api = _make_api("imxw")
         fn = ClimavenetaAPI._ClimavenetaAPI__hex_to_custom_string
         assert fn(0x05) == "0.05"
 
@@ -814,7 +806,6 @@ class TestDefaults:
 
     def test_try_initial_communication(self):
         api = _make_api("imxw")
-        import asyncio
         asyncio.get_event_loop().run_until_complete(api.try_initial_communication())
 
 

@@ -1,7 +1,6 @@
 {
   "name": "Climaveneta",
   "content_in_root": false,
-  "render_readme": true,
-  "domains": ["climaveneta"]
+  "render_readme": true
 }
 
