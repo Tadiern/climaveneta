@@ -1,0 +1,13 @@
+set_actual_temperature:
+  target:
+    entity:
+      integration: climaveneta
+      domain: climate
+  fields:
+    temperature:
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 40
+          step: 0.1

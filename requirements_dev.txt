@@ -1,0 +1,8 @@
+pytest
+pytest-homeassistant-custom-component
+ruff
+mypy
+pytest-asyncio
+pytest-mock
+aiounittest
+

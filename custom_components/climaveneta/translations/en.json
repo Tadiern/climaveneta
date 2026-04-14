@@ -1,0 +1,75 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Device is already configured"
+        },
+        "error": {
+            "invalid_modbus_hub": "Invalid serial device",
+            "invalid_slave_id": "Invalid slave ID",
+            "unknown": "Unknown error"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "hub": "Serial device path (e.g. /dev/ttyAMA0)",
+                    "device_type": "Select fancoil model",
+                    "name": "Name",
+                    "slave": "Modbus slave ID"
+                },
+                "description": "Insert the serial device path (e.g. /dev/ttyAMA0) and the Modbus slave ID",
+                "title": "Configure Climaveneta i-MXW / iLife2"
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "water_temperature": { "name": "Water temperature" },
+            "min_winter_fan_voltage": { "name": "Min. winter fan voltage" },
+            "max_winter_fan_voltage": { "name": "Max. winter fan voltage" },
+            "min_summer_fan_voltage": { "name": "Min. summer fan voltage" },
+            "max_summer_fan_voltage": { "name": "Max. summer fan voltage" },
+            "actual_temperature": { "name": "Actual temperature" },
+            "max_summer_water_temperature": { "name": "Max summer water temperature" },
+            "min_winter_water_temperature": { "name": "Min winter water temperature" },
+            "setpoint_hysteresis": { "name": "Setpoint hysteresis" },
+            "dead_zone_center": { "name": "Dead zone center" },
+            "dead_zone_range": { "name": "Dead zone range" },
+            "t1_compensation_delta": { "name": "T1 compensation delta" },
+            "antistrat_wait_time": { "name": "Anti-stratification wait time" },
+            "t1_compensation_base_summer": { "name": "T1 compensation base summer" },
+            "antistrat_time_summer": { "name": "Anti-stratification time summer" },
+            "t1_compensation_base_winter": { "name": "T1 compensation base winter" },
+            "antistrat_time_winter": { "name": "Anti-stratification time winter" },
+            "real_setpoint": { "name": "Real setpoint" },
+            "motor_speed_set": { "name": "Motor speed set" },
+            "modbus_address": { "name": "Modbus address" }
+        },
+        "binary_sensor": {
+            "pump_relay": { "name": "Pump relay" },
+            "alarm_communication": { "name": "Alarm: Communication" },
+            "alarm_air_probe": { "name": "Alarm: AIR probe" },
+            "alarm_h4_probe": { "name": "Alarm: H4 probe" },
+            "alarm_water_temperature": { "name": "Alarm: Water temperature" },
+            "alarm_h2_probe": { "name": "Alarm: H2 probe" },
+            "alarm_h4_wrong_temperature": { "name": "Alarm: H4 wrong temperature" },
+            "alarm_high_resistance": { "name": "Alarm: High resistance temperature" },
+            "alarm_motor_fault": { "name": "Alarm: Motor fault" },
+            "alarm_grid_open": { "name": "Alarm: GRID contact open" },
+            "alarm_h2_wrong_temperature": { "name": "Alarm: H2 wrong temperature" },
+            "alarm_filter_maintenance": { "name": "Alarm: Filter maintenance" },
+            "alarm_2air_m5": { "name": "Alarm: 2 AIR M5" }
+        }
+    },
+    "services": {
+        "set_actual_temperature": {
+            "description": "Sets an externally read temperature",
+            "fields": {
+                "temperature": {
+                    "description": "Name of any sensor or climate temperature",
+                    "name": "Entity"
+                }
+            },
+            "name": "Set actual temperature"
+        }
+    }
+}

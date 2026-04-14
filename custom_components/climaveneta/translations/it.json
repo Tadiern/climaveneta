@@ -1,0 +1,75 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Il dispositivo è già configurato"
+    },
+    "error": {
+      "invalid_modbus_hub": "Dispositivo seriale non valido",
+      "invalid_slave_id": "ID slave non valido",
+      "unknown": "Errore sconosciuto"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "hub": "Percorso dispositivo seriale (es. /dev/ttyAMA0)",
+          "device_type": "Seleziona il modello fancoil",
+          "name": "Nome",
+          "slave": "ID slave Modbus"
+        },
+        "description": "Inserisci il percorso del dispositivo seriale (es. /dev/ttyAMA0) e l'ID slave Modbus",
+        "title": "Configura Climaveneta i-MXW / iLife2"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "water_temperature": { "name": "Temperatura acqua" },
+      "min_winter_fan_voltage": { "name": "Tensione min. ventilatore inverno" },
+      "max_winter_fan_voltage": { "name": "Tensione max. ventilatore inverno" },
+      "min_summer_fan_voltage": { "name": "Tensione min. ventilatore estate" },
+      "max_summer_fan_voltage": { "name": "Tensione max. ventilatore estate" },
+      "actual_temperature": { "name": "Temperatura attuale" },
+      "max_summer_water_temperature": { "name": "Temperatura max. acqua estate" },
+      "min_winter_water_temperature": { "name": "Temperatura min. acqua inverno" },
+      "setpoint_hysteresis": { "name": "Isteresi setpoint" },
+      "dead_zone_center": { "name": "Centro zona morta" },
+      "dead_zone_range": { "name": "Range zona morta" },
+      "t1_compensation_delta": { "name": "Delta compensazione T1" },
+      "antistrat_wait_time": { "name": "Tempo attesa antistratificazione" },
+      "t1_compensation_base_summer": { "name": "Compensazione base T1 estate" },
+      "antistrat_time_summer": { "name": "Tempo antistratificazione estate" },
+      "t1_compensation_base_winter": { "name": "Compensazione base T1 inverno" },
+      "antistrat_time_winter": { "name": "Tempo antistratificazione inverno" },
+      "real_setpoint": { "name": "Setpoint reale" },
+      "motor_speed_set": { "name": "Velocità motore impostata" },
+      "modbus_address": { "name": "Indirizzo Modbus" }
+    },
+    "binary_sensor": {
+      "pump_relay": { "name": "Relè pompa" },
+      "alarm_communication": { "name": "Allarme: Comunicazione" },
+      "alarm_air_probe": { "name": "Allarme: Sonda AIR" },
+      "alarm_h4_probe": { "name": "Allarme: Sonda H4" },
+      "alarm_water_temperature": { "name": "Allarme: Temperatura acqua" },
+      "alarm_h2_probe": { "name": "Allarme: Sonda H2" },
+      "alarm_h4_wrong_temperature": { "name": "Allarme: Temperatura H4 errata" },
+      "alarm_high_resistance": { "name": "Allarme: Alta resistenza temperatura" },
+      "alarm_motor_fault": { "name": "Allarme: Guasto motore" },
+      "alarm_grid_open": { "name": "Allarme: Contatto GRID aperto" },
+      "alarm_h2_wrong_temperature": { "name": "Allarme: Temperatura H2 errata" },
+      "alarm_filter_maintenance": { "name": "Allarme: Manutenzione filtro" },
+      "alarm_2air_m5": { "name": "Allarme: 2 AIR M5" }
+    }
+  },
+  "services": {
+    "set_actual_temperature": {
+      "description": "Imposta la temperatura letta esternamente",
+      "fields": {
+        "temperature": {
+          "description": "Nome di un sensore o entità climate",
+          "name": "Entità"
+        }
+      },
+      "name": "Imposta temperatura reale"
+    }
+  }
+}

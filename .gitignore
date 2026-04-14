@@ -1,0 +1,23 @@
+# Home Assistant
+.ha_config/
+/climaveneta_ha.egg-info
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Packaging
+*.egg-info/
+dist/
+build/
+
+# VSCode
+.vscode/
+.devcontainer/
+
+# OS
+.DS_Store
+Thumbs.db
+
