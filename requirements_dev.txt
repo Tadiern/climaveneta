@@ -5,4 +5,5 @@ mypy
 pytest-asyncio
 pytest-mock
 aiounittest
+pymodbus
 
