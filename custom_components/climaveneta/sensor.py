@@ -352,7 +352,7 @@ class ClimavenetaSensor(CoordinatorEntity[ClimavenetaCoordinator], SensorEntity)
         try:
             self._attr_native_value = self.coordinator.data_readbacks[self.entity_description.key]
         except KeyError:
-            self._attr_native_value = None
+            self._attr_native_value = None  # type: ignore[assignment]
 
         # notify Home Assistant of the status change
         self.async_write_ha_state()

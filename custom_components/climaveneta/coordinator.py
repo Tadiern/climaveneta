@@ -143,28 +143,28 @@ class ClimavenetaCoordinator(DataUpdateCoordinator[None]):
 
         # update configuration data here at creation
         await self.api.async_read_configuration()
-        self.data_readbacks[CLIMAVENETA_MIN_WINTER] = self.api.get_min_voltage_winter()
-        self.data_readbacks[CLIMAVENETA_MAX_WINTER] = self.api.get_max_voltage_winter()
-        self.data_readbacks[CLIMAVENETA_MIN_SUMMER] = self.api.get_min_voltage_summer()
-        self.data_readbacks[CLIMAVENETA_MAX_SUMMER] = self.api.get_max_voltage_summer()
-        self.data_readbacks[CLIMAVENETA_MAX_WATER_TEMP_SUMMER] = self.api.get_max_water_temp_summer()
-        self.data_readbacks[CLIMAVENETA_MIN_WATER_TEMP_WINTER] = self.api.get_min_water_temp_winter()
-        self.data_readbacks[CLIMAVENETA_MODBUS_ADDRESS] = self.api.get_modbus_address()
+        self.data_readbacks[CLIMAVENETA_MIN_WINTER] = self.api.get_min_voltage_winter()  # type: ignore[assignment]
+        self.data_readbacks[CLIMAVENETA_MAX_WINTER] = self.api.get_max_voltage_winter()  # type: ignore[assignment]
+        self.data_readbacks[CLIMAVENETA_MIN_SUMMER] = self.api.get_min_voltage_summer()  # type: ignore[assignment]
+        self.data_readbacks[CLIMAVENETA_MAX_SUMMER] = self.api.get_max_voltage_summer()  # type: ignore[assignment]
+        self.data_readbacks[CLIMAVENETA_MAX_WATER_TEMP_SUMMER] = self.api.get_max_water_temp_summer()  # type: ignore[assignment]
+        self.data_readbacks[CLIMAVENETA_MIN_WATER_TEMP_WINTER] = self.api.get_min_water_temp_winter()  # type: ignore[assignment]
+        self.data_readbacks[CLIMAVENETA_MODBUS_ADDRESS] = self.api.get_modbus_address()  # type: ignore[assignment]
 
         # IMXW configuration registers (read once at startup)
         if self.device_type == CLIMAVENETA_IMXW:
-            self.data_readbacks[CLIMAVENETA_SETPOINT_HYSTERESIS] = self.api.get_setpoint_hysteresis()
-            self.data_readbacks[CLIMAVENETA_DEAD_ZONE_CENTER] = self.api.get_dead_zone_center()
-            self.data_readbacks[CLIMAVENETA_DEAD_ZONE_RANGE] = self.api.get_dead_zone_range()
-            self.data_readbacks[CLIMAVENETA_T1_COMPENSATION_DELTA] = self.api.get_t1_compensation_delta()
-            self.data_readbacks[CLIMAVENETA_ANTISTRAT_WAIT_TIME] = self.api.get_antistrat_wait_time()
-            self.data_readbacks[CLIMAVENETA_T1_COMPENSATION_BASE_SUMMER] = self.api.get_t1_compensation_base_summer()
-            self.data_readbacks[CLIMAVENETA_ANTISTRAT_TIME_SUMMER] = self.api.get_antistrat_time_summer()
-            self.data_readbacks[CLIMAVENETA_T1_COMPENSATION_BASE_WINTER] = self.api.get_t1_compensation_base_winter()
-            self.data_readbacks[CLIMAVENETA_ANTISTRAT_TIME_WINTER] = self.api.get_antistrat_time_winter()
-            self.data_readbacks[CLIMAVENETA_OFFSET_NTC_ETN] = self.api.get_offset_ntc_etn()
-            self.data_readbacks[CLIMAVENETA_CONTINUOUS_VENTILATION] = self.api.get_continuous_ventilation()
-            self.data_readbacks[CLIMAVENETA_MACHINE_SLAVE] = self.api.get_machine_slave()
+            self.data_readbacks[CLIMAVENETA_SETPOINT_HYSTERESIS] = self.api.get_setpoint_hysteresis()  # type: ignore[assignment]
+            self.data_readbacks[CLIMAVENETA_DEAD_ZONE_CENTER] = self.api.get_dead_zone_center()  # type: ignore[assignment]
+            self.data_readbacks[CLIMAVENETA_DEAD_ZONE_RANGE] = self.api.get_dead_zone_range()  # type: ignore[assignment]
+            self.data_readbacks[CLIMAVENETA_T1_COMPENSATION_DELTA] = self.api.get_t1_compensation_delta()  # type: ignore[assignment]
+            self.data_readbacks[CLIMAVENETA_ANTISTRAT_WAIT_TIME] = self.api.get_antistrat_wait_time()  # type: ignore[assignment]
+            self.data_readbacks[CLIMAVENETA_T1_COMPENSATION_BASE_SUMMER] = self.api.get_t1_compensation_base_summer()  # type: ignore[assignment]
+            self.data_readbacks[CLIMAVENETA_ANTISTRAT_TIME_SUMMER] = self.api.get_antistrat_time_summer()  # type: ignore[assignment]
+            self.data_readbacks[CLIMAVENETA_T1_COMPENSATION_BASE_WINTER] = self.api.get_t1_compensation_base_winter()  # type: ignore[assignment]
+            self.data_readbacks[CLIMAVENETA_ANTISTRAT_TIME_WINTER] = self.api.get_antistrat_time_winter()  # type: ignore[assignment]
+            self.data_readbacks[CLIMAVENETA_OFFSET_NTC_ETN] = self.api.get_offset_ntc_etn()  # type: ignore[assignment]
+            self.data_readbacks[CLIMAVENETA_CONTINUOUS_VENTILATION] = self.api.get_continuous_ventilation()  # type: ignore[assignment]
+            self.data_readbacks[CLIMAVENETA_MACHINE_SLAVE] = self.api.get_machine_slave()  # type: ignore[assignment]
 
         fw = self.api.get_firmware_version()
 

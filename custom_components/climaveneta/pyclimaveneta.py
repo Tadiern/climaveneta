@@ -1093,10 +1093,10 @@ class ClimavenetaAPI:
             return False
         return True
 
-    def read_register(self, register, count, slave) -> ModbusPDU:
+    def read_register(self, register, count, slave) -> ModbusPDU:  # type: ignore[name-defined]
         """Sync read of a modbus register."""
         lazy_error_count = CLIMAVENETA_MODBUS_LAZY_ERROR_COUNT
-        rr = 0
+        rr = 0  # type: ignore[assignment]
         while lazy_error_count > 0:
             try:
                 rr = ClimavenetaLock.port.read_holding_registers(
@@ -1118,7 +1118,7 @@ class ClimavenetaAPI:
                 continue
             break
 
-        return rr
+        return rr  # type: ignore[return-value]
 
     def write_register(self, register, value, slave) -> bool:
         """Sync write of a modbus register."""

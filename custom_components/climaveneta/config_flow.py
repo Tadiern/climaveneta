@@ -23,7 +23,7 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 
-class ClimavenetaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class ClimavenetaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[misc]
     """Handle a config flow for Climaveneta."""
 
     VERSION = 3

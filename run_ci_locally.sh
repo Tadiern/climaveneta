@@ -22,4 +22,7 @@ python -m pytest -q || {
 echo "✅ Tests passed!"
 echo ""
 
-echo "🎉 All checks passed! Safe to push."
+echo "📝 Note: HACS and Hassfest validation runs in GitHub CI"
+echo "        Use 'act -j hassfest' locally if needed (requires act)"
+echo ""
+echo "🎉 All local checks passed! Safe to push."
