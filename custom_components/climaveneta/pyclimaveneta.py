@@ -877,11 +877,15 @@ class ClimavenetaAPI:
         relay_on = False
 
         if self._unit_type == CLIMAVENETA_ILIFE2:
-            if (self._data_modbus["out_register"] & (1 << 3)) != 0:
-                # Heater relay enabled
-                relay_on = True
-            elif (self._data_modbus["out_register"] & (1 << 2)) != 0:
-                # Chiller relay enabled
+            out = self._data_modbus.get("out_register", 0)
+            stat = self._data_modbus.get("stat_register", 0)
+            # Bit 2: CHILLER, Bit 3: BOILER (OUT register)
+            # Also consider STAT register bits 0 or 1 as indicators
+            if (
+                (out & (1 << 3)) != 0
+                or (out & (1 << 2)) != 0
+                or (stat & ((1 << 0) | (1 << 1))) != 0
+            ):
                 relay_on = True
         else:
             # iMXW
@@ -1065,6 +1069,13 @@ class ClimavenetaAPI:
             )  # does not block
             result = future.result()  # blocks
 
+            _LOGGER.debug(
+                "Read result slave %d register %d raw: %s",
+                self._slave,
+                register,
+                getattr(result, "registers", None),
+            )
+
             if not hasattr(result, "registers"):
                 return old_value
 
@@ -1117,6 +1128,13 @@ class ClimavenetaAPI:
                 lazy_error_count -= 1
                 continue
             break
+
+        _LOGGER.debug(
+            "Sync read slave %d register %d -> raw: %s",
+            slave,
+            register,
+            getattr(rr, "registers", None),
+        )
 
         return rr  # type: ignore[return-value]
 
