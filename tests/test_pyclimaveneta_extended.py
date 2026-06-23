@@ -1,10 +1,8 @@
 """Extended tests for pyclimaveneta — covers getters, HVAC logic, setters, modbus I/O."""
 
-import asyncio
 import pytest
 from unittest.mock import MagicMock, AsyncMock, patch
 
-from custom_components.climaveneta import pyclimaveneta
 from custom_components.climaveneta.pyclimaveneta import (
     ClimavenetaAPI,
     ClimavenetaLock,
