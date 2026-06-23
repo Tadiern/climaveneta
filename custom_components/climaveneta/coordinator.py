@@ -141,6 +141,8 @@ class ClimavenetaCoordinator(DataUpdateCoordinator[None]):
             modbus_client, self.slave_id, unit_model
         )
 
+        await self.api.try_initial_communication()
+
         # update configuration data here at creation
         await self.api.async_read_configuration()
         self.data_readbacks[CLIMAVENETA_MIN_WINTER] = self.api.get_min_voltage_winter()  # type: ignore[assignment]

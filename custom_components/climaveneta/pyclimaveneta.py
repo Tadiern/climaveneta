@@ -1,6 +1,8 @@
 """Connection to a Climaveneta i-MXW or iLife2 ModBus API."""
 
+import asyncio
 from concurrent.futures import ThreadPoolExecutor
+import functools
 import logging
 import time
 
@@ -167,7 +169,6 @@ class ClimavenetaAPI:
         if ClimavenetaLock.initialized is False:
             ClimavenetaLock.port = port
             ClimavenetaLock.initialized = True
-            ClimavenetaLock.port.connect()
 
         self._slave = slave
         self._unit_type = unit_type
@@ -236,13 +237,9 @@ class ClimavenetaAPI:
         self._data_modbus["modbus_address"] = 0
 
     async def try_initial_communication(self) -> None:
-        """Connect to rs485 device."""
-        # async with ClimavenetaLock.lock:
-        # future = cv_pool.submit(ClimavenetaLock.port.connect)  # does not block
-        # result = future.result()  # blocks
-
-        result = "ok"
-
+        """Connect to rs485 device (non-blocking)."""
+        loop = asyncio.get_running_loop()
+        result = await loop.run_in_executor(cv_pool, ClimavenetaLock.port.connect)
         _LOGGER.info(
             "Connected slave %d unit type %s, connected %s",
             self._slave,
@@ -1053,7 +1050,7 @@ class ClimavenetaAPI:
                 self._data_modbus["preset_mode"] = preset_mode
 
     async def _read_modbus_register(self, register, old_value):
-        """Queue a modbus read."""
+        """Queue a modbus read (non-blocking)."""
         _LOGGER.info(
             "Calling read register slave %d unit type %s register %d",
             self._slave,
@@ -1061,13 +1058,11 @@ class ClimavenetaAPI:
             register,
         )
         try:
-            future = cv_pool.submit(
-                self.read_register,
-                register=register,
-                count=1,
-                slave=self._slave,
-            )  # does not block
-            result = future.result()  # blocks
+            loop = asyncio.get_running_loop()
+            result = await loop.run_in_executor(
+                cv_pool,
+                functools.partial(self.read_register, register=register, count=1, slave=self._slave),
+            )
 
             _LOGGER.debug(
                 "Read result slave %d register %d raw: %s",
@@ -1091,14 +1086,12 @@ class ClimavenetaAPI:
         return old_value
 
     async def _write_modbus_register(self, register, value) -> bool:
-        """Queue a modbus write."""
-        future = cv_pool.submit(
-            self.write_register,
-            register=register,
-            value=value,
-            slave=self._slave,
-        )  # does not block
-        result = future.result()  # blocks
+        """Queue a modbus write (non-blocking)."""
+        loop = asyncio.get_running_loop()
+        result = await loop.run_in_executor(
+            cv_pool,
+            functools.partial(self.write_register, register=register, value=value, slave=self._slave),
+        )
 
         if not result:
             return False
