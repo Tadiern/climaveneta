@@ -734,10 +734,9 @@ class TestModbusIO:
         api = _make_api("imxw")
         mock_result = MagicMock()
         mock_result.registers = [42]
-        with patch.object(pyclimaveneta, "cv_pool") as mock_pool:
-            future = MagicMock()
-            future.result.return_value = mock_result
-            mock_pool.submit.return_value = future
+        mock_loop = MagicMock()
+        mock_loop.run_in_executor = AsyncMock(return_value=mock_result)
+        with patch("asyncio.get_running_loop", return_value=mock_loop):
             val = await api._read_modbus_register(0x1002, 99)
         assert val == 42
 
@@ -745,10 +744,9 @@ class TestModbusIO:
     async def test_read_register_no_registers_attr(self):
         api = _make_api("imxw")
         mock_result = MagicMock(spec=[])  # no 'registers' attribute
-        with patch.object(pyclimaveneta, "cv_pool") as mock_pool:
-            future = MagicMock()
-            future.result.return_value = mock_result
-            mock_pool.submit.return_value = future
+        mock_loop = MagicMock()
+        mock_loop.run_in_executor = AsyncMock(return_value=mock_result)
+        with patch("asyncio.get_running_loop", return_value=mock_loop):
             val = await api._read_modbus_register(0x1002, 99)
         assert val == 99  # returns old_value
 
@@ -756,8 +754,9 @@ class TestModbusIO:
     async def test_read_register_modbus_exception(self):
         api = _make_api("imxw")
         from pymodbus.exceptions import ModbusException
-        with patch.object(pyclimaveneta, "cv_pool") as mock_pool:
-            mock_pool.submit.side_effect = ModbusException("fail")
+        mock_loop = MagicMock()
+        mock_loop.run_in_executor = AsyncMock(side_effect=ModbusException("fail"))
+        with patch("asyncio.get_running_loop", return_value=mock_loop):
             val = await api._read_modbus_register(0x1002, 77)
         assert val == 77  # returns old_value
 
@@ -804,9 +803,13 @@ class TestDefaults:
         assert api._data_modbus["stat_register"] == 0
         assert "relay5_fan_high" not in api._data_modbus  # iMXW-only
 
-    def test_try_initial_communication(self):
+    @pytest.mark.asyncio
+    async def test_try_initial_communication(self):
         api = _make_api("imxw")
-        asyncio.get_event_loop().run_until_complete(api.try_initial_communication())
+        mock_loop = MagicMock()
+        mock_loop.run_in_executor = AsyncMock(return_value=None)
+        with patch("asyncio.get_running_loop", return_value=mock_loop):
+            await api.try_initial_communication()
 
 
 # ────────────────────────── async_read_configuration ──────────────────────────
