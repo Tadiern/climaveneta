@@ -1,6 +1,7 @@
 # Climaveneta iMXW / iLife2 — Home Assistant Integration
 
-[![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://hacs.xyz)
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/hacs/integration)
+[![integration usage](https://img.shields.io/badge/dynamic/json?color=41BDF5&logo=home-assistant&label=integration%20usage&suffix=%20installs&cacheSeconds=15600&url=https://analytics.home-assistant.io/custom_integrations.json&query=$.climaveneta.total)](https://github.com/Tadiern/climaveneta)
 [![GitHub release](https://img.shields.io/github/v/release/Tadiern/climaveneta)](https://github.com/Tadiern/climaveneta/releases/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![CI](https://github.com/Tadiern/climaveneta/actions/workflows/ci.yml/badge.svg)](https://github.com/Tadiern/climaveneta/actions/workflows/ci.yml)
