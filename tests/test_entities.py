@@ -117,7 +117,7 @@ class TestSensorTypeDefinitions:
             assert desc.entity_category == EntityCategory.DIAGNOSTIC
 
     def test_window_input_device_class(self):
-        window = [d for d in IMXW_BINARY_SENSOR_TYPES if d.key == CLIMAVENETA_WINDOW_INPUT][0]
+        window = next(d for d in IMXW_BINARY_SENSOR_TYPES if d.key == CLIMAVENETA_WINDOW_INPUT)
         assert window.device_class == BinarySensorDeviceClass.WINDOW
 
     def test_alarm_device_classes(self):
@@ -129,7 +129,7 @@ class TestSensorTypeDefinitions:
             CLIMAVENETA_ALARM_WATER_DRAIN,
         ]
         for key in alarm_keys:
-            desc = [d for d in IMXW_BINARY_SENSOR_TYPES if d.key == key][0]
+            desc = next(d for d in IMXW_BINARY_SENSOR_TYPES if d.key == key)
             assert desc.device_class == BinarySensorDeviceClass.PROBLEM
 
 
@@ -381,19 +381,19 @@ class TestNumberTypeDefinitions:
             assert desc.key in _GETTER_MAP
 
     def test_antistrat_wait_time_range(self):
-        desc = [d for d in IMXW_NUMBER_TYPES if d.key == CLIMAVENETA_ANTISTRAT_WAIT_TIME][0]
+        desc = next(d for d in IMXW_NUMBER_TYPES if d.key == CLIMAVENETA_ANTISTRAT_WAIT_TIME)
         assert desc.native_min_value == 10
         assert desc.native_max_value == 20
         assert desc.native_step == 1
 
     def test_t1_base_summer_range(self):
-        desc = [d for d in IMXW_NUMBER_TYPES if d.key == CLIMAVENETA_T1_COMPENSATION_BASE_SUMMER][0]
+        desc = next(d for d in IMXW_NUMBER_TYPES if d.key == CLIMAVENETA_T1_COMPENSATION_BASE_SUMMER)
         assert desc.native_min_value == 0.5
         assert desc.native_max_value == 2.0
         assert desc.native_step == 0.1
 
     def test_antistrat_time_summer_range(self):
-        desc = [d for d in IMXW_NUMBER_TYPES if d.key == CLIMAVENETA_ANTISTRAT_TIME_SUMMER][0]
+        desc = next(d for d in IMXW_NUMBER_TYPES if d.key == CLIMAVENETA_ANTISTRAT_TIME_SUMMER)
         assert desc.native_min_value == 30
         assert desc.native_max_value == 180
 
@@ -403,7 +403,7 @@ class TestClimavenetaNumber:
 
     def _make_number(self, key=CLIMAVENETA_ANTISTRAT_WAIT_TIME):
         coord = _mock_coordinator()
-        desc = [d for d in IMXW_NUMBER_TYPES if d.key == key][0]
+        desc = next(d for d in IMXW_NUMBER_TYPES if d.key == key)
         with patch.object(ClimavenetaNumber, "__init__", lambda self, *a, **kw: None):
             entity = ClimavenetaNumber.__new__(ClimavenetaNumber)
         entity.coordinator = coord

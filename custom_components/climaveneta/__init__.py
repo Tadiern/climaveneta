@@ -128,11 +128,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
 
         new_version = 3
 
-    if new_version < 4:
-        # v4 moves communication to Home Assistant's shared Modbus connection.
-        # The persisted serial path and slave ID are intentionally unchanged so
-        # device/entity identifiers, areas, and customizations stay intact.
-        new_version = 4
+    new_version = max(new_version, 4)
 
     if new_version != config_entry.version:
         hass.config_entries.async_update_entry(

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import Any, ClassVar
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
@@ -121,7 +121,7 @@ class ClimavenetaClimate(CoordinatorEntity[ClimavenetaCoordinator], ClimateEntit
     """Representation of a Climaveneta fancoil unit."""
 
     _attr_has_entity_name = True
-    _attr_fan_modes = [FAN_AUTO, FAN_LOW, FAN_MEDIUM, FAN_HIGH]
+    _attr_fan_modes: ClassVar[list[str]] = [FAN_AUTO, FAN_LOW, FAN_MEDIUM, FAN_HIGH]
     _attr_fan_mode = FAN_AUTO
     _attr_target_temperature_step = 0.1
 
@@ -313,13 +313,11 @@ class ClimavenetaClimate(CoordinatorEntity[ClimavenetaCoordinator], ClimateEntit
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         """Set new preset mode."""
-        if self._type == CLIMAVENETA_IMXW:
-            # only if imxw for now
-            if preset_mode in (
-                PRESET_NONE,
-                PRESET_ECO,
-                PRESET_AWAY,
-            ):
+        if self._type == CLIMAVENETA_IMXW and preset_mode in (
+            PRESET_NONE,
+            PRESET_ECO,
+            PRESET_AWAY,
+        ):
                 for key, value in imxw_preset_modes.items():
                     if preset_mode == value:
                         clivaveneta_preset_mode = key

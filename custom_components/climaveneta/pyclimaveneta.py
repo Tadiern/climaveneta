@@ -494,17 +494,15 @@ class ClimavenetaAPI:
                 self._actual_true_temperature,
             )
 
-        if self._data_modbus["external_probe_enabled"]:
-            # reset the enable actual true temperature if no updates for at least 15 minutes
-            if (
-                self._last_time_true_temperature_sent
-                + CLIMAVENETA_IMXW_TIMEOUT_TRUE_TEMPERATURE_SECONDS
-            ) < time.time():
-                self._enable_actual_true_temperature = False
-                await self._write_modbus_register(
-                    IMXW_AMBIENT_TEMP_EXTERNAL_PROBE_ENABLED_REGISTER, 0
-                )
-
+        if self._data_modbus["external_probe_enabled"] and (
+            self._last_time_true_temperature_sent
+            + CLIMAVENETA_IMXW_TIMEOUT_TRUE_TEMPERATURE_SECONDS
+        ) < time.time():
+            # Reset the external probe after 15 minutes without an update.
+            self._enable_actual_true_temperature = False
+            await self._write_modbus_register(
+                IMXW_AMBIENT_TEMP_EXTERNAL_PROBE_ENABLED_REGISTER, 0
+            )
         return self._data_modbus
 
     async def _async_update_ilife2(self):
@@ -705,7 +703,7 @@ class ClimavenetaAPI:
 
     async def set_t1_compensation_base_summer(self, value: float) -> bool:
         """Set the T1 compensation base summer (t1SE) in °C (0.5-2.0)."""
-        raw = int(round(value * 10.0))
+        raw = round(value * 10.0)
         result = await self._write_modbus_register(IMXW_T1_COMPENSATION_BASE_SUMMER_REGISTER, raw)
         if result:
             self._data_modbus["t1_compensation_base_summer"] = raw
@@ -720,7 +718,7 @@ class ClimavenetaAPI:
 
     async def set_t1_compensation_base_winter(self, value: float) -> bool:
         """Set the T1 compensation base winter (t1SI) in °C (0.5-5.0)."""
-        raw = int(round(value * 10.0))
+        raw = round(value * 10.0)
         result = await self._write_modbus_register(IMXW_T1_COMPENSATION_BASE_WINTER_REGISTER, raw)
         if result:
             self._data_modbus["t1_compensation_base_winter"] = raw
@@ -902,7 +900,7 @@ class ClimavenetaAPI:
         """Set the actual true room temperature read from an external thermostat."""
 
         if self._unit_type == CLIMAVENETA_IMXW:
-            self._actual_true_temperature = int(round(temp * 10.0))
+            self._actual_true_temperature = round(temp * 10.0)
             self._enable_actual_true_temperature = True
             self._last_time_true_temperature_sent = time.time()
 
