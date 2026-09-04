@@ -1,10 +1,11 @@
 {
   "domain": "climaveneta",
   "name": "Climaveneta",
+  "after_dependencies": ["modbus"],
   "codeowners": ["@Tadiern"],
   "config_flow": true,
   "documentation": "https://github.com/Tadiern/climaveneta",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/Tadiern/climaveneta/issues",
-  "version": "2.0.0b1"
+  "version": "2.0.0b2"
 }

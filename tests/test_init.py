@@ -1,5 +1,6 @@
 """Tests for Climaveneta integration setup."""
 
+import importlib
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -31,8 +32,10 @@ async def test_setup_uses_home_assistant_shared_modbus_unit(mocker) -> None:
     }
 
     unit = MagicMock()
-    get_unit = mocker.patch(
-        "homeassistant.components.modbus.async_get_unit",
+    modbus = importlib.import_module("homeassistant.components.modbus")
+    get_unit = mocker.patch.object(
+        modbus,
+        "async_get_unit",
         return_value=unit,
         create=True,
     )
