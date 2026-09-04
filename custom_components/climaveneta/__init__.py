@@ -3,6 +3,7 @@
 import logging
 
 import voluptuous as vol
+from modbus_connection import ModbusSerialParams
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_TEMPERATURE, CONF_NAME, CONF_SLAVE, Platform
@@ -35,8 +36,11 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
         config_entry.version,
     )
 
+    new_data = dict(config_entry.data)
+    new_title = config_entry.title
+    new_version = config_entry.version
+
     if config_entry.version < 3:
-        new_data = dict(config_entry.data)
         current_hub = new_data.get(CONF_HUB, "")
         slave_id = new_data.get(CONF_SLAVE, 0)
 
@@ -117,20 +121,28 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
             )
 
         # Update title to reflect new hub
-        new_title = config_entry.title
         if old_hub and old_hub != current_hub:
             new_title = new_title.replace(
                 f"at {old_hub}:", f"at {current_hub}:"
             )
 
+        new_version = 3
+
+    if new_version < 4:
+        # v4 moves communication to Home Assistant's shared Modbus connection.
+        # The persisted serial path and slave ID are intentionally unchanged so
+        # device/entity identifiers, areas, and customizations stay intact.
+        new_version = 4
+
+    if new_version != config_entry.version:
         hass.config_entries.async_update_entry(
-            config_entry, data=new_data, title=new_title, version=3
+            config_entry, data=new_data, title=new_title, version=new_version
         )
 
     _LOGGER.info(
         "Migration of entry '%s' to version %s successful",
         config_entry.title,
-        config_entry.version,
+        new_version,
     )
     return True
 
@@ -138,15 +150,30 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up platform from a ConfigEntry."""
 
+    # Available from Home Assistant 2026.9. Kept local so static imports of
+    # this integration still work in tooling using an older HA test runtime.
+    from homeassistant.components.modbus import async_get_unit
+
     device_type = entry.data[DEVICE_TYPE]
     hub = entry.data[CONF_HUB]
     slave_id = entry.data[CONF_SLAVE]
     name = entry.data[CONF_NAME]
 
+    unit = async_get_unit(
+        hass,
+        entry,
+        ModbusSerialParams(
+            device=hub,
+            baudrate=9600,
+            bytesize=8,
+            parity="N",
+            stopbits=1,
+            framer="rtu",
+        ),
+        slave_id,
+    )
     coordinator = ClimavenetaCoordinator(hass, device_type, hub, slave_id, name)
-    await coordinator.async_create()
-
-    await coordinator.api.try_initial_communication()
+    await coordinator.async_create(unit)
 
     await coordinator.async_config_entry_first_refresh()
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator

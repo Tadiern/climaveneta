@@ -20,16 +20,7 @@ def test_hex_to_custom_string():
 
 def _make_api(unit_type="imxw"):
     """Create a ClimavenetaAPI with mocked Modbus connection."""
-    # Save and restore initialized state to avoid interference between tests
-    orig_initialized = pyclimaveneta.ClimavenetaLock.initialized
-    pyclimaveneta.ClimavenetaLock.initialized = True
-    mock_port = MagicMock()
-    pyclimaveneta.ClimavenetaLock.port = mock_port
-    try:
-        api = pyclimaveneta.ClimavenetaAPI(MagicMock(), 1, unit_type)
-    finally:
-        pyclimaveneta.ClimavenetaLock.initialized = orig_initialized
-    return api
+    return pyclimaveneta.ClimavenetaAPI(MagicMock(), 1, unit_type)
 
 
 class TestClimavenetaAPIImxw:

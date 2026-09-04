@@ -1,11 +1,12 @@
 """Extended tests for pyclimaveneta — covers getters, HVAC logic, setters, modbus I/O."""
 
 import pytest
-from unittest.mock import MagicMock, AsyncMock, patch
+from unittest.mock import MagicMock, AsyncMock
+
+from modbus_connection import ModbusError
 
 from custom_components.climaveneta.pyclimaveneta import (
     ClimavenetaAPI,
-    ClimavenetaLock,
     CV_MODE_OFF,
     CV_MODE_ON,
     CV_MODE_FAN_ONLY,
@@ -35,14 +36,7 @@ from custom_components.climaveneta.pyclimaveneta import (
 
 def _make_api(unit_type="imxw"):
     """Create a ClimavenetaAPI with mocked Modbus connection."""
-    orig = ClimavenetaLock.initialized
-    ClimavenetaLock.initialized = True
-    ClimavenetaLock.port = MagicMock()
-    try:
-        api = ClimavenetaAPI(MagicMock(), 1, unit_type)
-    finally:
-        ClimavenetaLock.initialized = orig
-    return api
+    return ClimavenetaAPI(MagicMock(), 1, unit_type)
 
 
 # ────────────────────────── iMXW diagnostic getters ──────────────────────────
@@ -730,33 +724,39 @@ class TestModbusIO:
     @pytest.mark.asyncio
     async def test_read_register_success(self):
         api = _make_api("imxw")
-        mock_result = MagicMock()
-        mock_result.registers = [42]
-        mock_loop = MagicMock()
-        mock_loop.run_in_executor = AsyncMock(return_value=mock_result)
-        with patch("asyncio.get_running_loop", return_value=mock_loop):
-            val = await api._read_modbus_register(0x1002, 99)
+        api._unit.read_holding_registers = AsyncMock(return_value=[42])
+        val = await api._read_modbus_register(0x1002, 99)
         assert val == 42
+        api._unit.read_holding_registers.assert_awaited_once_with(0x1002, count=1)
 
     @pytest.mark.asyncio
-    async def test_read_register_no_registers_attr(self):
+    async def test_read_register_empty_response(self):
         api = _make_api("imxw")
-        mock_result = MagicMock(spec=[])  # no 'registers' attribute
-        mock_loop = MagicMock()
-        mock_loop.run_in_executor = AsyncMock(return_value=mock_result)
-        with patch("asyncio.get_running_loop", return_value=mock_loop):
-            val = await api._read_modbus_register(0x1002, 99)
+        api._unit.read_holding_registers = AsyncMock(return_value=[])
+        val = await api._read_modbus_register(0x1002, 99)
         assert val == 99  # returns old_value
 
     @pytest.mark.asyncio
     async def test_read_register_modbus_exception(self):
         api = _make_api("imxw")
-        from pymodbus.exceptions import ModbusException
-        mock_loop = MagicMock()
-        mock_loop.run_in_executor = AsyncMock(side_effect=ModbusException("fail"))
-        with patch("asyncio.get_running_loop", return_value=mock_loop):
-            val = await api._read_modbus_register(0x1002, 77)
+        api._unit.read_holding_registers = AsyncMock(side_effect=ModbusError("fail"))
+        val = await api._read_modbus_register(0x1002, 77)
         assert val == 77  # returns old_value
+
+    @pytest.mark.asyncio
+    async def test_write_register_success(self):
+        api = _make_api("imxw")
+        api._unit.write_register = AsyncMock()
+
+        assert await api._write_modbus_register(0x105C, 1) is True
+        api._unit.write_register.assert_awaited_once_with(0x105C, 1)
+
+    @pytest.mark.asyncio
+    async def test_write_register_modbus_exception(self):
+        api = _make_api("imxw")
+        api._unit.write_register = AsyncMock(side_effect=ModbusError("fail"))
+
+        assert await api._write_modbus_register(0x105C, 1) is False
 
 
 # ────────────────────────── hex_to_custom_string edge cases ──────────────────────────
@@ -800,15 +800,6 @@ class TestDefaults:
         assert api._data_modbus["program_register"] == 0b10000000
         assert api._data_modbus["stat_register"] == 0
         assert "relay5_fan_high" not in api._data_modbus  # iMXW-only
-
-    @pytest.mark.asyncio
-    async def test_try_initial_communication(self):
-        api = _make_api("imxw")
-        mock_loop = MagicMock()
-        mock_loop.run_in_executor = AsyncMock(return_value=None)
-        with patch("asyncio.get_running_loop", return_value=mock_loop):
-            await api.try_initial_communication()
-
 
 # ────────────────────────── async_read_configuration ──────────────────────────
 

@@ -9,7 +9,6 @@ def _make_mock_api():
     mock_api = MagicMock()
     mock_api.async_read_configuration = AsyncMock()
     mock_api.async_update = AsyncMock()
-    mock_api.try_initial_communication = AsyncMock()
     mock_api.get_min_voltage_winter = MagicMock(return_value=0.0)
     mock_api.get_max_voltage_winter = MagicMock(return_value=0.0)
     mock_api.get_min_voltage_summer = MagicMock(return_value=0.0)
@@ -48,15 +47,11 @@ async def test_async_create_imxw(mocker):
         return_value=mock_api,
     )
     mocker.patch(
-        "custom_components.climaveneta.coordinator.ModbusSerialClient",
-        return_value=MagicMock(),
-    )
-    mocker.patch(
         "homeassistant.helpers.frame.report_usage",
     )
 
     coord = ClimavenetaCoordinator(hass, "imxw", "/dev/ttyUSB0", 1, "test")
-    await coord.async_create()
+    await coord.async_create(MagicMock())
 
     assert hasattr(coord, "api")
     mock_api.async_read_configuration.assert_awaited_once()
@@ -74,15 +69,11 @@ async def test_async_create_ilife2(mocker):
         return_value=mock_api,
     )
     mocker.patch(
-        "custom_components.climaveneta.coordinator.ModbusSerialClient",
-        return_value=MagicMock(),
-    )
-    mocker.patch(
         "homeassistant.helpers.frame.report_usage",
     )
 
     coord = ClimavenetaCoordinator(hass, "ilife2", "/dev/ttyUSB0", 2, "test_ilife")
-    await coord.async_create()
+    await coord.async_create(MagicMock())
 
     assert hasattr(coord, "api")
     mock_api.async_read_configuration.assert_awaited_once()

@@ -39,7 +39,6 @@ def _make_mock_api():
     mock_api = MagicMock()
     mock_api.async_read_configuration = AsyncMock()
     mock_api.async_update = AsyncMock()
-    mock_api.try_initial_communication = AsyncMock()
     mock_api.get_min_voltage_winter = MagicMock(return_value=2.0)
     mock_api.get_max_voltage_winter = MagicMock(return_value=9.0)
     mock_api.get_min_voltage_summer = MagicMock(return_value=1.5)
@@ -87,10 +86,6 @@ def _make_coordinator(hass, device_type, mock_api, mocker):
         return_value=mock_api,
     )
     mocker.patch(
-        "custom_components.climaveneta.coordinator.ModbusSerialClient",
-        return_value=MagicMock(),
-    )
-    mocker.patch(
         "homeassistant.helpers.frame.report_usage",
     )
     coord = ClimavenetaCoordinator(hass, device_type, "/dev/ttyUSB0", 1, "test")
@@ -105,7 +100,7 @@ async def test_update_data_imxw(mocker):
     hass = MagicMock()
     mock_api = _make_mock_api()
     coord = _make_coordinator(hass, "imxw", mock_api, mocker)
-    await coord.async_create()
+    await coord.async_create(MagicMock())
 
     # Run the periodic update
     await coord._async_update_data()
@@ -147,7 +142,7 @@ async def test_update_data_ilife2(mocker):
     hass = MagicMock()
     mock_api = _make_mock_api()
     coord = _make_coordinator(hass, "ilife2", mock_api, mocker)
-    await coord.async_create()
+    await coord.async_create(MagicMock())
 
     await coord._async_update_data()
 
@@ -181,7 +176,7 @@ async def test_async_create_imxw_dip_readbacks(mocker):
     hass = MagicMock()
     mock_api = _make_mock_api()
     coord = _make_coordinator(hass, "imxw", mock_api, mocker)
-    await coord.async_create()
+    await coord.async_create(MagicMock())
 
     assert coord.data_readbacks[CLIMAVENETA_CONTINUOUS_VENTILATION] is True
     assert coord.data_readbacks[CLIMAVENETA_MACHINE_SLAVE] is False
@@ -193,7 +188,7 @@ async def test_async_create_ilife2_no_imxw_config(mocker):
     hass = MagicMock()
     mock_api = _make_mock_api()
     coord = _make_coordinator(hass, "ilife2", mock_api, mocker)
-    await coord.async_create()
+    await coord.async_create(MagicMock())
 
     assert CLIMAVENETA_SETPOINT_HYSTERESIS not in coord.data_readbacks
     assert CLIMAVENETA_CONTINUOUS_VENTILATION not in coord.data_readbacks
@@ -206,6 +201,6 @@ async def test_coordinator_device_info_updated(mocker):
     hass = MagicMock()
     mock_api = _make_mock_api()
     coord = _make_coordinator(hass, "imxw", mock_api, mocker)
-    await coord.async_create()
+    await coord.async_create(MagicMock())
 
     assert coord.device_info["sw_version"] == "1.06"

@@ -2,9 +2,7 @@
 
 import logging
 
-# from pymodbus.client import AsyncModbusSerialClient
-from pymodbus.client import ModbusSerialClient
-from pymodbus.framer import FramerType
+from modbus_connection import ModbusUnit
 
 # from homeassistant.components.modbus import ModbusHub
 from homeassistant.core import HomeAssistant
@@ -108,28 +106,13 @@ class ClimavenetaCoordinator(DataUpdateCoordinator[None]):
         self.api: pyclimaveneta.ClimavenetaAPI
         self.data_readbacks: dict[str, int] = {}
 
-    async def async_create(self):
-        """Create serial connection."""
-        # modbus_client = AsyncModbusSerialClient(
-        # Use the configured hub value as the serial device path (e.g. /dev/ttyAMA0)
-        # Home Assistant may later provide a Modbus hub object here; currently
-        # the config stores a string path so we pass it directly to pymodbus.
+    async def async_create(self, unit: ModbusUnit) -> None:
+        """Create the device API from Home Assistant's shared Modbus unit."""
         _LOGGER.debug(
-            "Creating Modbus serial client for device %s on port %s with slave ID %d",
+            "Creating Climaveneta API for device %s on port %s with slave ID %d",
             self.device_type,
             self.hub,
             self.slave_id,
-        )
-        modbus_client = ModbusSerialClient(
-            self.hub,
-            bytesize=8,
-            baudrate=9600,
-            parity="N",
-            framer=FramerType.RTU,
-            stopbits=1,
-            retries=3,
-            reconnect_delay=100,
-            timeout=1,
         )
 
         if self.device_type == CLIMAVENETA_IMXW:
@@ -138,10 +121,8 @@ class ClimavenetaCoordinator(DataUpdateCoordinator[None]):
             unit_model = pyclimaveneta.CLIMAVENETA_ILIFE2
 
         self.api = pyclimaveneta.ClimavenetaAPI(
-            modbus_client, self.slave_id, unit_model
+            unit, self.slave_id, unit_model
         )
-
-        await self.api.try_initial_communication()
 
         # update configuration data here at creation
         await self.api.async_read_configuration()

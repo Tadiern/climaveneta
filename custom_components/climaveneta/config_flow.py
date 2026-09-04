@@ -26,7 +26,7 @@ _LOGGER = logging.getLogger(__name__)
 class ClimavenetaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[misc]
     """Handle a config flow for Climaveneta."""
 
-    VERSION = 3
+    VERSION = 4
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None

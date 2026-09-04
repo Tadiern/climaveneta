@@ -8,6 +8,12 @@
 
 Custom integration for [Home Assistant](https://www.home-assistant.io/) to control **Mitsubishi-Climaveneta** fancoils via Modbus RTU (RS-485).
 
+> [!IMPORTANT]
+> This release requires **Home Assistant 2026.9.0 or newer**. HACS prevents this
+> release from being offered to older installations. It uses Home Assistant's
+> shared Modbus connection API; it is not compatible with earlier Home Assistant
+> versions.
+
 ## Supported models
 
 | Brand | Model | Protocol | Config type | Status |
@@ -28,6 +34,17 @@ This integration has only been tested on Climaveneta hardware. However, since th
 - RS-485 adapter (e.g. USB-to-RS485 or Raspberry Pi HAT)
 - Wired connection to the fancoil Modbus bus
 - Each fancoil must have a unique Modbus slave ID
+
+### Modbus connection handling
+
+The integration uses Home Assistant's shared Modbus connection. A connection is
+opened on demand, reconnects automatically, and serializes requests from every
+integration using the same RS-485 adapter. Do not configure a separate Modbus
+YAML hub for this integration.
+
+For devices on the same serial bus, use the same serial-device path and keep the
+line settings consistent. Climaveneta uses Modbus RTU at **9600 baud, 8 data
+bits, no parity, 1 stop bit (8N1)**. Each fancoil must use a different slave ID.
 
 ## Installation
 
@@ -53,6 +70,19 @@ This integration has only been tested on Climaveneta hardware. However, since th
    - **Modbus slave ID** (1–255)
    - **Fancoil model** (i-MXW or iLife2)
    - **Name** for the device
+
+## Upgrading from an earlier release
+
+1. Upgrade Home Assistant to **2026.9.0 or newer** before installing this
+   integration release.
+2. Update the integration through HACS (or replace the custom component
+   directory) and restart Home Assistant.
+3. The existing Climaveneta config entries migrate automatically. The serial
+   device path, slave ID, device name, device registry entry, entity IDs, areas,
+   and customizations are preserved; no reconfiguration is required.
+
+If Home Assistant is older than 2026.9.0, keep the previous integration release
+until Home Assistant has been upgraded.
 
 ## Exposed entities
 
@@ -104,4 +134,3 @@ python -m ruff check .
 ## License
 
 [MIT](LICENSE)
-

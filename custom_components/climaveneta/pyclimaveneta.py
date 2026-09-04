@@ -1,14 +1,9 @@
 """Connection to a Climaveneta i-MXW or iLife2 ModBus API."""
 
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
-import functools
 import logging
 import time
 
-from pymodbus.client import ModbusSerialClient
-from pymodbus.exceptions import ModbusException
-from pymodbus.pdu import ModbusPDU
+from modbus_connection import ModbusError, ModbusUnit
 
 IMXW_FIRMWARE_RELEASE_REGISTER = 0x1001
 IMXW_ACTUAL_AIR_TEMPERATURE_REGISTER = 0x1002
@@ -141,22 +136,7 @@ CLIMAVENETA_ILIFE2 = "ilife2"
 
 """ Delays and timeouts """
 CLIMAVENETA_IMXW_TIMEOUT_TRUE_TEMPERATURE_SECONDS = 15 * 60
-CLIMAVENETA_MODBUS_LAZY_ERROR_COUNT = 2
-CLIMAVENETA_MODBUS_OK_SLEEP_SECONDS = 0.04
-CLIMAVENETA_MODBUS_KO_SLEEP_SECONDS = 0.2
-
 _LOGGER = logging.getLogger(__name__)
-
-
-cv_pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="climaveneta_executor")
-
-
-class ClimavenetaLock:
-    """Climaveneta global lock and executor class."""
-
-    #    lock = asyncio.Lock()
-    initialized = False
-    port: ModbusSerialClient
 
 
 class ClimavenetaAPI:
@@ -164,12 +144,9 @@ class ClimavenetaAPI:
 
     _connected = False
 
-    def __init__(self, port, slave, unit_type) -> None:
+    def __init__(self, unit: ModbusUnit, slave: int, unit_type: str) -> None:
         """Initialize Climaveneta communication."""
-        if ClimavenetaLock.initialized is False:
-            ClimavenetaLock.port = port
-            ClimavenetaLock.initialized = True
-
+        self._unit = unit
         self._slave = slave
         self._unit_type = unit_type
         self._data_modbus: dict[str, int] = {}
@@ -235,17 +212,6 @@ class ClimavenetaAPI:
         self._data_modbus["min_water_temp_winter"] = 0
         self._data_modbus["out_register"] = 0
         self._data_modbus["modbus_address"] = 0
-
-    async def try_initial_communication(self) -> None:
-        """Connect to rs485 device (non-blocking)."""
-        loop = asyncio.get_running_loop()
-        result = await loop.run_in_executor(cv_pool, ClimavenetaLock.port.connect)
-        _LOGGER.info(
-            "Connected slave %d unit type %s, connected %s",
-            self._slave,
-            self._unit_type,
-            result,
-        )
 
     async def async_read_configuration(self):
         """Request current configuration from heat pump."""
@@ -1050,7 +1016,7 @@ class ClimavenetaAPI:
                 self._data_modbus["preset_mode"] = preset_mode
 
     async def _read_modbus_register(self, register, old_value):
-        """Queue a modbus read (non-blocking)."""
+        """Read one holding register through the shared Modbus unit."""
         _LOGGER.info(
             "Calling read register slave %d unit type %s register %d",
             self._slave,
@@ -1058,25 +1024,18 @@ class ClimavenetaAPI:
             register,
         )
         try:
-            loop = asyncio.get_running_loop()
-            result = await loop.run_in_executor(
-                cv_pool,
-                functools.partial(self.read_register, register=register, count=1, slave=self._slave),
-            )
-
+            registers = await self._unit.read_holding_registers(register, count=1)
+            if not registers:
+                return old_value
             _LOGGER.debug(
                 "Read result slave %d register %d raw: %s",
                 self._slave,
                 register,
-                getattr(result, "registers", None),
+                registers,
             )
+            return int(registers[0])
 
-            if not hasattr(result, "registers"):
-                return old_value
-
-            return int(result.registers[0])
-
-        except ModbusException:
+        except ModbusError:
             _LOGGER.info(
                 "Exception on read register slave %d unit type %s register %d",
                 self._slave,
@@ -1086,73 +1045,15 @@ class ClimavenetaAPI:
         return old_value
 
     async def _write_modbus_register(self, register, value) -> bool:
-        """Queue a modbus write (non-blocking)."""
-        loop = asyncio.get_running_loop()
-        result = await loop.run_in_executor(
-            cv_pool,
-            functools.partial(self.write_register, register=register, value=value, slave=self._slave),
-        )
-
-        if not result:
+        """Write one holding register through the shared Modbus unit."""
+        try:
+            await self._unit.write_register(register, value)
+        except ModbusError:
+            _LOGGER.info(
+                "Exception on write register slave %d unit type %s register %d",
+                self._slave,
+                self._unit_type,
+                register,
+            )
             return False
-        return True
-
-    def read_register(self, register, count, slave) -> ModbusPDU:  # type: ignore[name-defined]
-        """Sync read of a modbus register."""
-        lazy_error_count = CLIMAVENETA_MODBUS_LAZY_ERROR_COUNT
-        rr = 0  # type: ignore[assignment]
-        while lazy_error_count > 0:
-            try:
-                rr = ClimavenetaLock.port.read_holding_registers(
-                    register, count=count, device_id=slave
-                )
-                time.sleep(CLIMAVENETA_MODBUS_OK_SLEEP_SECONDS)
-            except ModbusException:
-                _LOGGER.debug(
-                    "Read exception, retry %d on slave %d", lazy_error_count, slave
-                )
-                time.sleep(CLIMAVENETA_MODBUS_KO_SLEEP_SECONDS)
-                lazy_error_count -= 1
-                continue
-            if not hasattr(rr, "registers"):
-                _LOGGER.debug(
-                    "Read returned no registers, retry %d on slave %d", lazy_error_count, slave
-                )
-                lazy_error_count -= 1
-                continue
-            break
-
-        _LOGGER.debug(
-            "Sync read slave %d register %d -> raw: %s",
-            slave,
-            register,
-            getattr(rr, "registers", None),
-        )
-
-        return rr  # type: ignore[return-value]
-
-    def write_register(self, register, value, slave) -> bool:
-        """Sync write of a modbus register."""
-        lazy_error_count = CLIMAVENETA_MODBUS_LAZY_ERROR_COUNT
-        while lazy_error_count > 0:
-            try:
-                rr = ClimavenetaLock.port.write_register(
-                    register, value=value, device_id=slave
-                )
-                time.sleep(CLIMAVENETA_MODBUS_OK_SLEEP_SECONDS)
-            except ModbusException:
-                _LOGGER.debug(
-                    "Write exception, retry %d on slave %d", lazy_error_count, slave
-                )
-                time.sleep(CLIMAVENETA_MODBUS_KO_SLEEP_SECONDS)
-                lazy_error_count -= 1
-                continue
-            if not hasattr(rr, "registers"):
-                _LOGGER.debug(
-                    "Write returned no registers, retry %d on slave %d", lazy_error_count, slave
-                )
-                lazy_error_count -= 1
-                continue
-            break
-
         return True
