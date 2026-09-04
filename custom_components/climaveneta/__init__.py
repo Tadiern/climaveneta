@@ -3,12 +3,12 @@
 import logging
 
 import voluptuous as vol
-from modbus_connection import ModbusSerialParams
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_TEMPERATURE, CONF_NAME, CONF_SLAVE, Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import entity_registry as er
+from modbus_connection import ModbusSerialParams
 
 from .const import CONF_HUB, DEFAULT_MODBUS_HUB, DEVICE_TYPE, DOMAIN
 from .coordinator import ClimavenetaCoordinator

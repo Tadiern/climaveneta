@@ -1,6 +1,6 @@
 pytest
 pytest-homeassistant-custom-component
-ruff
+ruff==0.16.6
 mypy
 pytest-asyncio
 pytest-mock

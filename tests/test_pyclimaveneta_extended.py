@@ -1,36 +1,36 @@
 """Extended tests for pyclimaveneta — covers getters, HVAC logic, setters, modbus I/O."""
 
-import pytest
-from unittest.mock import MagicMock, AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
+import pytest
 from modbus_connection import ModbusError
 
 from custom_components.climaveneta.pyclimaveneta import (
-    ClimavenetaAPI,
-    CV_MODE_OFF,
-    CV_MODE_ON,
-    CV_MODE_FAN_ONLY,
-    CV_MODE_COOL,
-    CV_MODE_HEAT,
-    CV_MODE_HEAT_COOL,
-    CV_ACTION_OFF,
-    CV_ACTION_IDLE,
-    CV_ACTION_FAN,
     CV_ACTION_COOLING,
+    CV_ACTION_FAN,
     CV_ACTION_HEATING,
+    CV_ACTION_IDLE,
+    CV_ACTION_OFF,
     CV_FAN_AUTO,
+    CV_FAN_HIGH,
     CV_FAN_LOW,
     CV_FAN_MEDIUM,
-    CV_FAN_HIGH,
     CV_FAN_OFF,
     CV_FAN_ON,
+    CV_MODE_COOL,
+    CV_MODE_FAN_ONLY,
+    CV_MODE_HEAT,
+    CV_MODE_HEAT_COOL,
+    CV_MODE_OFF,
+    CV_MODE_ON,
     CV_MODE_SUMMER,
     CV_MODE_WINTER,
+    CV_PRESET_MODE_AWAY,
+    CV_PRESET_MODE_ECO,
+    CV_PRESET_MODE_NONE,
     CV_WATER_BYPASS,
     CV_WATER_CIRCULATING,
-    CV_PRESET_MODE_NONE,
-    CV_PRESET_MODE_ECO,
-    CV_PRESET_MODE_AWAY,
+    ClimavenetaAPI,
 )
 
 
@@ -813,7 +813,8 @@ class TestAsyncReadConfiguration:
 
         async def mock_read(register, old_value):
             from custom_components.climaveneta.pyclimaveneta import (
-                IMXW_DIP1_REGISTER, IMXW_DIP2_REGISTER,
+                IMXW_DIP1_REGISTER,
+                IMXW_DIP2_REGISTER,
             )
             call_count["i"] += 1
             if register == IMXW_DIP1_REGISTER:
@@ -864,7 +865,9 @@ class TestAsyncReadConfiguration:
         api = _make_api("imxw")
 
         async def mock_read(register, old_value):
-            from custom_components.climaveneta.pyclimaveneta import IMXW_OFFSET_NTC_ETN_REGISTER
+            from custom_components.climaveneta.pyclimaveneta import (
+                IMXW_OFFSET_NTC_ETN_REGISTER,
+            )
             if register == IMXW_OFFSET_NTC_ETN_REGISTER:
                 return 15  # +1.5 °C
             return old_value
@@ -882,7 +885,9 @@ class TestAsyncReadConfiguration:
         api = _make_api("imxw")
 
         async def mock_read(register, old_value):
-            from custom_components.climaveneta.pyclimaveneta import IMXW_OFFSET_NTC_ETN_REGISTER
+            from custom_components.climaveneta.pyclimaveneta import (
+                IMXW_OFFSET_NTC_ETN_REGISTER,
+            )
             if register == IMXW_OFFSET_NTC_ETN_REGISTER:
                 return 65516  # unsigned representation of -20
             return old_value

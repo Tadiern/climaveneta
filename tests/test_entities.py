@@ -1,59 +1,61 @@
 """Tests for sensor and binary_sensor entity classes."""
 
-import pytest
 from unittest.mock import MagicMock, patch
 
-from homeassistant.components.sensor import SensorDeviceClass
+import pytest
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import EntityCategory
 
-from custom_components.climaveneta.sensor import (
-    ClimavenetaSensor,
-    ClimavenetaSensorEntityDescription,
-    ClimavenetaHvacStatusSensor,
-    IMXW_SENSOR_TYPES,
-    ILIFE2_SENSOR_TYPES,
-    HVAC_STATUS_OPTIONS,
-    HVAC_ACTION_TO_STRING,
-)
 from custom_components.climaveneta.binary_sensor import (
+    ILIFE2_BINARY_SENSOR_TYPES,
+    IMXW_BINARY_SENSOR_TYPES,
     ClimavenetaBinarySensor,
     ClimavenetaBinarySensorEntityDescription,
-    IMXW_BINARY_SENSOR_TYPES,
-    ILIFE2_BINARY_SENSOR_TYPES,
-)
-from custom_components.climaveneta.number import (
-    ClimavenetaNumber,
-    IMXW_NUMBER_TYPES,
-    _SETTER_MAP,
-    _GETTER_MAP,
-    async_setup_entry as number_setup_entry,
 )
 from custom_components.climaveneta.const import (
-    CLIMAVENETA_EXCHANGER_TEMPERATURE,
-    CLIMAVENETA_HVAC_STATUS,
-    CLIMAVENETA_PUMP_RELAY,
-    CLIMAVENETA_RELAY5_FAN_HIGH,
-    CLIMAVENETA_CONTINUOUS_VENTILATION,
-    CLIMAVENETA_MACHINE_SLAVE,
-    CLIMAVENETA_WINDOW_INPUT,
-    CLIMAVENETA_PUMP_ALARM_INPUT,
-    CLIMAVENETA_HEATER_PRESENT,
     CLIMAVENETA_ALARM_T1,
     CLIMAVENETA_ALARM_T2,
     CLIMAVENETA_ALARM_T3,
     CLIMAVENETA_ALARM_WATER_DRAIN,
-    CLIMAVENETA_ANTISTRAT_WAIT_TIME,
-    CLIMAVENETA_T1_COMPENSATION_BASE_SUMMER,
     CLIMAVENETA_ANTISTRAT_TIME_SUMMER,
     CLIMAVENETA_ANTISTRAT_TIME_WINTER,
+    CLIMAVENETA_ANTISTRAT_WAIT_TIME,
+    CLIMAVENETA_CONTINUOUS_VENTILATION,
+    CLIMAVENETA_EXCHANGER_TEMPERATURE,
+    CLIMAVENETA_HEATER_PRESENT,
+    CLIMAVENETA_HVAC_STATUS,
+    CLIMAVENETA_MACHINE_SLAVE,
+    CLIMAVENETA_PUMP_ALARM_INPUT,
+    CLIMAVENETA_PUMP_RELAY,
+    CLIMAVENETA_RELAY5_FAN_HIGH,
+    CLIMAVENETA_T1_COMPENSATION_BASE_SUMMER,
+    CLIMAVENETA_WINDOW_INPUT,
+)
+from custom_components.climaveneta.number import (
+    _GETTER_MAP,
+    _SETTER_MAP,
+    IMXW_NUMBER_TYPES,
+    ClimavenetaNumber,
+)
+from custom_components.climaveneta.number import (
+    async_setup_entry as number_setup_entry,
 )
 from custom_components.climaveneta.pyclimaveneta import (
-    CV_ACTION_OFF,
-    CV_ACTION_IDLE,
-    CV_ACTION_FAN,
     CV_ACTION_COOLING,
+    CV_ACTION_FAN,
     CV_ACTION_HEATING,
+    CV_ACTION_IDLE,
+    CV_ACTION_OFF,
+)
+from custom_components.climaveneta.sensor import (
+    HVAC_ACTION_TO_STRING,
+    HVAC_STATUS_OPTIONS,
+    ILIFE2_SENSOR_TYPES,
+    IMXW_SENSOR_TYPES,
+    ClimavenetaHvacStatusSensor,
+    ClimavenetaSensor,
+    ClimavenetaSensorEntityDescription,
 )
 
 
