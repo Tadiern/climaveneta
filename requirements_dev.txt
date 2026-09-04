@@ -6,4 +6,5 @@ pytest-asyncio
 pytest-mock
 aiounittest
 modbus-connection
+pymodbus==3.11.2
 
